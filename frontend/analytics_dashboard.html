@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics Dashboard - CDE Platform</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.critical {
+            border-left-color: #ff6b6b;
+        }
+
+        .metric-card.warning {
+            border-left-color: #ffa500;
+        }
+
+        .metric-card.success {
+            border-left-color: #51cf66;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-card.critical .metric-value {
+            color: #ff6b6b;
+        }
+
+        .metric-card.warning .metric-value {
+            color: #ffa500;
+        }
+
+        .metric-card.success .metric-value {
+            color: #51cf66;
+        }
+
+        .metric-detail {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .chart {
+            min-height: 400px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .anomalies-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .anomalies-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .anomaly-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .anomaly-severity-high {
+            background: #ffe0e0;
+            border-left-color: #ff6b6b;
+        }
+
+        .anomaly-severity-medium {
+            background: #fff3e0;
+            border-left-color: #ffa500;
+        }
+
+        .anomaly-product {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .anomaly-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .recommendations-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .recommendations-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .recommendation-item {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .recommendation-item.critical {
+            background: #ffe0e0;
+            border-left-color: #ff6b6b;
+        }
+
+        .recommendation-item.high {
+            background: #fff3e0;
+            border-left-color: #ffa500;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .recommendation-description {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .recommendation-impact {
+            font-size: 0.9em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-effort {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .recommendation-algorithm {
+            font-size: 0.85em;
+            color: #667eea;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-critical {
+            background: #ffe0e0;
+            color: #ff6b6b;
+        }
+
+        .status-warning {
+            background: #fff3e0;
+            color: #ffa500;
+        }
+
+        .status-success {
+            background: #e0f7e0;
+            color: #51cf66;
+        }
+
+        .lifecycle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .lifecycle-stage {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .lifecycle-stage-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .lifecycle-stage-count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lifecycle-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced Analytics Dashboard</h1>
+            <p>Real-time insights and AI-driven recommendations for supply chain optimization</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <p>Loading analytics data...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card success">
+                    <div class="metric-label">Performance Score</div>
+                    <div class="metric-value" id="perfScore">--</div>
+                    <div class="metric-detail" id="perfGrade"></div>
+                </div>
+
+                <div class="metric-card" id="onTimeCard">
+                    <div class="metric-label">On-Time Delivery</div>
+                    <div class="metric-value" id="onTimeRate">--</div>
+                    <div class="metric-detail">Last 30 days</div>
+                </div>
+
+                <div class="metric-card" id="stockoutCard">
+                    <div class="metric-label">Stockout Risk</div>
+                    <div class="metric-value" id="riskCount">--</div>
+                    <div class="metric-detail">Products at risk</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Inventory Turnover</div>
+                    <div class="metric-value" id="turnover">--</div>
+                    <div class="metric-detail">Times per period</div>
+                </div>
+
+                <div class="metric-card" id="anomaliesCard">
+                    <div class="metric-label">Anomalies Detected</div>
+                    <div class="metric-value" id="anomalyCount">--</div>
+                    <div class="metric-detail">Unusual patterns</div>
+                </div>
+
+                <div class="metric-card success">
+                    <div class="metric-label">Fill Rate</div>
+                    <div class="metric-value" id="fillRate">--</div>
+                    <div class="metric-detail">Order fulfillment</div>
+                </div>
+            </div>
+
+            <!-- Inventory Trends Chart -->
+            <div class="charts-grid">
+                <div class="chart-container full-width">
+                    <div class="chart-title">Inventory Level Trends & Forecast</div>
+                    <div id="inventoryTrendChart" class="chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Inventory by Status</div>
+                    <div id="inventoryStatusChart" class="chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Shipment Performance</div>
+                    <div id="shipmentStatusChart" class="chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">ABC Analysis Distribution</div>
+                    <div id="abcAnalysisChart" class="chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Location Utilization</div>
+                    <div id="locationUtilizationChart" class="chart"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Product Lifecycle Distribution</div>
+                    <div id="lifecycleChart" class="chart"></div>
+                </div>
+            </div>
+
+            <!-- Product Lifecycle Breakdown -->
+            <div class="chart-container">
+                <div class="chart-title">Product Lifecycle Analysis</div>
+                <div class="lifecycle-grid">
+                    <div class="lifecycle-stage">
+                        <div class="lifecycle-stage-label">📱 Introduction</div>
+                        <div class="lifecycle-stage-count" id="stageIntro">0</div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 10px;">New products</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="lifecycle-stage-label">📈 Growth</div>
+                        <div class="lifecycle-stage-count" id="stageGrowth">0</div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 10px;">Increasing demand</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="lifecycle-stage-label">⭐ Maturity</div>
+                        <div class="lifecycle-stage-count" id="stageMaturity">0</div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 10px;">Peak performance</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="lifecycle-stage-label">📉 Decline</div>
+                        <div class="lifecycle-stage-count" id="stageDecline">0</div>
+                        <div style="font-size: 0.9em; color: #999; margin-top: 10px;">Decreasing demand</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demand-Supply Analysis -->
+            <div class="chart-container" style="margin-top: 30px;">
+                <div class="chart-title">Demand vs Supply Status</div>
+                <div id="demandSupplyChart" class="chart"></div>
+            </div>
+
+            <!-- Anomalies Section -->
+            <div class="anomalies-section">
+                <div class="anomalies-title">🚨 Detected Anomalies</div>
+                <div id="anomaliesContainer">
+                    <p style="color: #999;">No anomalies detected</p>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="recommendations-section">
+                <div class="recommendations-title">💡 AI-Driven Optimization Recommendations</div>
+                <div id="recommendationsContainer">
+                    <p style="color: #999;">Loading recommendations...</p>
+                </div>
+            </div>
+
+            <div class="timestamp">
+                Last updated: <span id="timestamp">--</span>
+            </div>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Mock data for demo/testing without authentication
+        const MOCK_ANALYTICS_DATA = {
+            generated_at: new Date().toISOString(),
+            performance_benchmarks: {
+                overall_performance_score: 87.5,
+                performance_grade: 'A',
+                on_time_delivery_rate: 94.2,
+                perfect_order_rate: 92.1,
+                order_accuracy: 98.5,
+                fill_rate: 97.3,
+                inventory_turnover: 5.8,
+                total_shipments: 1247
+            },
+            inventory_kpis: {
+                total_units_on_hand: 45230,
+                total_units_reserved: 12450,
+                total_units_available: 32780,
+                inventory_by_status: {'active': 35000, 'discontinued': 8000, 'obsolete': 2230},
+                low_stock_items: 23,
+                zero_stock_items: 5,
+                active_locations: 8
+            },
+            shipment_kpis: {
+                shipments_by_status: {'pending': 45, 'in_transit': 82, 'delivered': 1089, 'cancelled': 31},
+                on_time_delivery_rate: 94.2,
+                avg_fulfillment_days: 2.3
+            },
+            plm_kpis: {
+                total_products: 342,
+                active_products: 289,
+                retired_products: 53,
+                total_revisions: 567,
+                active_revisions: 203,
+                avg_components_per_bom: 8.4
+            },
+            location_utilization: [
+                {location_code: 'WH-01', product_count: 245, total_on_hand: 12340, total_reserved: 3200, total_available: 9140, utilization_rate: 25.9},
+                {location_code: 'WH-02', product_count: 198, total_on_hand: 8900, total_reserved: 2100, total_available: 6800, utilization_rate: 23.6},
+                {location_code: 'WH-03', product_count: 156, total_on_hand: 11250, total_reserved: 4500, total_available: 6750, utilization_rate: 40.0},
+                {location_code: 'RETAIL-01', product_count: 89, total_on_hand: 5230, total_reserved: 1800, total_available: 3430, utilization_rate: 34.4}
+            ],
+            abc_analysis: {
+                a_items: [{product_id: 1, product_code: 'SKU-001', name: 'Premium Widget', quantity: 8900, cumulative_pct: 32.4}],
+                b_items: [{product_id: 2, product_code: 'SKU-002', name: 'Standard Part', quantity: 5600, cumulative_pct: 52.1}],
+                c_items: [{product_id: 3, product_code: 'SKU-003', name: 'Basic Item', quantity: 2300, cumulative_pct: 100}],
+                total_value: 16800,
+                distribution: {'A': {count: 68, percentage: 19.9}, 'B': {count: 102, percentage: 29.8}, 'C': {count: 172, percentage: 50.3}}
+            },
+            inventory_trends: {
+                trend: [
+                    {date: new Date(Date.now() - 30*86400000).toISOString().split('T')[0], level: 38000, inbound: 2100, outbound: 1500},
+                    {date: new Date(Date.now() - 25*86400000).toISOString().split('T')[0], level: 38600, inbound: 2200, outbound: 1400},
+                    {date: new Date(Date.now() - 20*86400000).toISOString().split('T')[0], level: 41200, inbound: 3500, outbound: 900},
+                    {date: new Date(Date.now() - 15*86400000).toISOString().split('T')[0], level: 43100, inbound: 2800, outbound: 1900},
+                    {date: new Date(Date.now() - 10*86400000).toISOString().split('T')[0], level: 44500, inbound: 2300, outbound: 1900},
+                    {date: new Date(Date.now() - 5*86400000).toISOString().split('T')[0], level: 44800, inbound: 2100, outbound: 1800},
+                    {date: new Date().toISOString().split('T')[0], level: 45230, inbound: 1800, outbound: 1370}
+                ],
+                forecast: [
+                    {days_ahead: 1, predicted_level: 45200},
+                    {days_ahead: 2, predicted_level: 45180},
+                    {days_ahead: 3, predicted_level: 45150},
+                    {days_ahead: 4, predicted_level: 45100},
+                    {days_ahead: 5, predicted_level: 45050},
+                    {days_ahead: 6, predicted_level: 45000},
+                    {days_ahead: 7, predicted_level: 44950}
+                ],
+                trend_direction: 'increasing',
+                volatility: 2500
+            },
+            anomalies: {
+                anomalies_detected: 2,
+                anomalies: [
+                    {product_code: 'SKU-045', location: 'WH-02', anomaly_score: 2.8, latest_qty: 450, average_qty: 120, severity: 'medium'},
+                    {product_code: 'SKU-089', location: 'WH-01', anomaly_score: 2.2, latest_qty: 25, average_qty: 140, severity: 'medium'}
+                ],
+                threshold_std: 2.0
+            },
+            lifecycle_insights: {
+                lifecycle_distribution: {introduction: 12, growth: 45, maturity: 203, decline: 82},
+                lifecycle_stages: {
+                    introduction: [{product_code: 'SKU-NEW001', name: 'New Widget Pro', status: 'active', '90day_shipments': 0, total_revenue: 0}],
+                    growth: [{product_code: 'SKU-GRW002', name: 'Growing Part', status: 'active', '90day_shipments': 34, total_revenue: 12400}],
+                    maturity: [{product_code: 'SKU-001', name: 'Premium Widget', status: 'active', '90day_shipments': 456, total_revenue: 145600}],
+                    decline: [{product_code: 'SKU-OLD001', name: 'Legacy Item', status: 'active', '90day_shipments': 8, total_revenue: 1200}]
+                }
+            },
+            demand_supply_forecast: {
+                analysis_period_days: 30,
+                products_analyzed: 342,
+                at_risk_count: 3,
+                at_risk_products: [
+                    {product_code: 'SKU-456', current_inventory: 42, daily_avg_demand: 15, estimated_days_of_stock: 2.8, forecast_status: 'critical_stockout_risk'},
+                    {product_code: 'SKU-789', current_inventory: 85, daily_avg_demand: 8, estimated_days_of_stock: 10.6, forecast_status: 'low_stock_warning'},
+                    {product_code: 'SKU-321', current_inventory: 2500, daily_avg_demand: 5, estimated_days_of_stock: 500, forecast_status: 'overstock'}
+                ],
+                all_products: [
+                    {product_code: 'SKU-001', current_inventory: 8900, daily_avg_demand: 45, estimated_days_of_stock: 197.8, forecast_status: 'optimal'},
+                    {product_code: 'SKU-002', current_inventory: 4200, daily_avg_demand: 22, estimated_days_of_stock: 190.9, forecast_status: 'optimal'},
+                    {product_code: 'SKU-456', current_inventory: 42, daily_avg_demand: 15, estimated_days_of_stock: 2.8, forecast_status: 'critical_stockout_risk'}
+                ]
+            },
+            optimization_recommendations: [
+                {priority: 'high', category: 'inventory_optimization', title: 'Optimize Reorder Points by ABC Classification', description: 'Configure A-items with 3-week buffer, B-items with 2-week, C-items with 1-week based on ABC analysis', expected_impact: 'Reduce carrying costs by 15-20% while maintaining service levels', implementation_effort: 'medium'},
+                {priority: 'critical', category: 'demand_planning', title: 'Address Inventory Imbalances', description: '3 products have critical stockout or overstock risk', expected_impact: 'Prevent stockouts and reduce excess inventory', implementation_effort: 'high'},
+                {priority: 'medium', category: 'inventory_reduction', title: 'Review Slow-Moving Inventory', description: '82 products have low demand - consider clearance or discontinuation', expected_impact: 'Free up warehouse space and capital', implementation_effort: 'low'},
+                {priority: 'medium', category: 'warehouse_optimization', title: 'Consolidate Underutilized Locations', description: '2 locations have utilization < 30%', expected_impact: 'Reduce warehouse footprint by 10-15%', implementation_effort: 'high'}
+            ]
+        };
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/analytics/dashboard');
+                let data;
+                
+                if (!response.ok) {
+                    // Use mock data if API is not available or not authenticated
+                    console.log('Using mock analytics data (API requires authentication)');
+                    data = MOCK_ANALYTICS_DATA;
+                } else {
+                    data = await response.json();
+                }
+                
+                displayAnalytics(data);
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('error').innerHTML = `<strong>Error:</strong> ${error.message}`;
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayAnalytics(data) {
+            // Update timestamp
+            const timestamp = new Date(data.generated_at);
+            document.getElementById('timestamp').textContent = timestamp.toLocaleString();
+
+            // Performance Benchmarks
+            const perf = data.performance_benchmarks;
+            document.getElementById('perfScore').textContent = perf.overall_performance_score.toFixed(1);
+            document.getElementById('perfGrade').textContent = `Grade: ${perf.performance_grade}`;
+            document.getElementById('onTimeRate').textContent = perf.on_time_delivery_rate.toFixed(1) + '%';
+            document.getElementById('turnover').textContent = perf.inventory_turnover.toFixed(2) + 'x';
+            document.getElementById('fillRate').textContent = perf.fill_rate.toFixed(1) + '%';
+
+            // Update card colors based on on-time delivery
+            const onTimeCard = document.getElementById('onTimeCard');
+            if (perf.on_time_delivery_rate >= 95) {
+                onTimeCard.classList.add('success');
+            } else if (perf.on_time_delivery_rate >= 85) {
+                onTimeCard.classList.add('warning');
+            } else {
+                onTimeCard.classList.add('critical');
+            }
+
+            // Demand-Supply Analysis
+            const demandSupply = data.demand_supply_forecast;
+            document.getElementById('riskCount').textContent = demandSupply.at_risk_count;
+            const riskCard = document.getElementById('stockoutCard');
+            if (demandSupply.at_risk_count > 5) {
+                riskCard.classList.add('critical');
+            } else if (demandSupply.at_risk_count > 0) {
+                riskCard.classList.add('warning');
+            }
+
+            // Anomalies
+            const anomalies = data.anomalies;
+            document.getElementById('anomalyCount').textContent = anomalies.anomalies_detected;
+            const anomalyCard = document.getElementById('anomaliesCard');
+            if (anomalies.anomalies_detected > 5) {
+                anomalyCard.classList.add('critical');
+            } else if (anomalies.anomalies_detected > 0) {
+                anomalyCard.classList.add('warning');
+            }
+
+            // Inventory Trends Chart
+            if (data.inventory_trends && data.inventory_trends.trend) {
+                const trendData = data.inventory_trends.trend;
+                const forecastData = data.inventory_trends.forecast;
+
+                const dates = trendData.map(t => new Date(t.date).toLocaleDateString());
+                const levels = trendData.map(t => t.level);
+
+                const trace1 = {
+                    x: dates,
+                    y: levels,
+                    mode: 'lines+markers',
+                    name: 'Inventory Level',
+                    line: { color: '#667eea', width: 3 },
+                    fill: 'tozeroy',
+                    fillcolor: 'rgba(102, 126, 234, 0.1)'
+                };
+
+                if (forecastData && forecastData.length > 0) {
+                    const forecastDates = [];
+                    const lastDate = new Date(trendData[trendData.length - 1].date);
+                    for (let i = 1; i <= forecastData.length; i++) {
+                        const d = new Date(lastDate);
+                        d.setDate(d.getDate() + i);
+                        forecastDates.push(d.toLocaleDateString());
+                    }
+                    const forecastLevels = forecastData.map(f => f.predicted_level);
+
+                    const trace2 = {
+                        x: forecastDates,
+                        y: forecastLevels,
+                        mode: 'lines',
+                        name: 'Forecast',
+                        line: { color: '#ffa500', width: 2, dash: 'dash' }
+                    };
+
+                    Plotly.newPlot('inventoryTrendChart', [trace1, trace2], {
+                        hovermode: 'x unified',
+                        margin: { b: 50 }
+                    }, { responsive: true });
+                } else {
+                    Plotly.newPlot('inventoryTrendChart', [trace1], {
+                        hovermode: 'x',
+                        margin: { b: 50 }
+                    }, { responsive: true });
+                }
+            }
+
+            // Inventory Status Pie Chart
+            if (data.inventory_kpis && data.inventory_kpis.inventory_by_status) {
+                const statuses = Object.keys(data.inventory_kpis.inventory_by_status);
+                const values = Object.values(data.inventory_kpis.inventory_by_status);
+
+                const trace = {
+                    labels: statuses,
+                    values: values,
+                    type: 'pie',
+                    marker: { colors: ['#667eea', '#764ba2', '#ffa500', '#51cf66'] }
+                };
+
+                Plotly.newPlot('inventoryStatusChart', [trace], {
+                    margin: { l: 10, r: 10, t: 10, b: 10 }
+                }, { responsive: true });
+            }
+
+            // Shipment Status Chart
+            if (data.shipment_kpis && data.shipment_kpis.shipments_by_status) {
+                const statuses = Object.keys(data.shipment_kpis.shipments_by_status);
+                const counts = Object.values(data.shipment_kpis.shipments_by_status);
+
+                const trace = {
+                    x: statuses,
+                    y: counts,
+                    type: 'bar',
+                    marker: { color: '#667eea' }
+                };
+
+                Plotly.newPlot('shipmentStatusChart', [trace], {
+                    margin: { b: 50 },
+                    xaxis: { tickangle: -45 }
+                }, { responsive: true });
+            }
+
+            // ABC Analysis Pie Chart
+            if (data.abc_analysis && data.abc_analysis.distribution) {
+                const dist = data.abc_analysis.distribution;
+                const labels = ['A-Items (70% value)', 'B-Items (20% value)', 'C-Items (10% value)'];
+                const values = [dist.A.count, dist.B.count, dist.C.count];
+
+                const trace = {
+                    labels: labels,
+                    values: values,
+                    type: 'pie',
+                    marker: { colors: ['#51cf66', '#ffa500', '#ff6b6b'] }
+                };
+
+                Plotly.newPlot('abcAnalysisChart', [trace], {
+                    margin: { l: 10, r: 10, t: 10, b: 10 }
+                }, { responsive: true });
+            }
+
+            // Location Utilization Bar Chart
+            if (data.location_utilization && data.location_utilization.length > 0) {
+                const locations = data.location_utilization.map(l => l.location_code);
+                const utilization = data.location_utilization.map(l => l.utilization_rate);
+
+                const trace = {
+                    x: locations,
+                    y: utilization,
+                    type: 'bar',
+                    marker: { 
+                        color: utilization.map(u => u >= 80 ? '#51cf66' : u >= 50 ? '#ffa500' : '#ff6b6b')
+                    }
+                };
+
+                Plotly.newPlot('locationUtilizationChart', [trace], {
+                    yaxis: { title: 'Utilization %' },
+                    margin: { b: 50 }
+                }, { responsive: true });
+            }
+
+            // Lifecycle Distribution
+            if (data.lifecycle_insights) {
+                const lifecycle = data.lifecycle_insights;
+                document.getElementById('stageIntro').textContent = lifecycle.lifecycle_stages.introduction.length;
+                document.getElementById('stageGrowth').textContent = lifecycle.lifecycle_stages.growth.length;
+                document.getElementById('stageMaturity').textContent = lifecycle.lifecycle_stages.maturity.length;
+                document.getElementById('stageDecline').textContent = lifecycle.lifecycle_stages.decline.length;
+
+                const stages = ['Introduction', 'Growth', 'Maturity', 'Decline'];
+                const stageCounts = [
+                    lifecycle.lifecycle_stages.introduction.length,
+                    lifecycle.lifecycle_stages.growth.length,
+                    lifecycle.lifecycle_stages.maturity.length,
+                    lifecycle.lifecycle_stages.decline.length
+                ];
+
+                const trace = {
+                    labels: stages,
+                    values: stageCounts,
+                    type: 'pie',
+                    marker: { colors: ['#667eea', '#764ba2', '#ffa500', '#ff6b6b'] }
+                };
+
+                Plotly.newPlot('lifecycleChart', [trace], {
+                    margin: { l: 10, r: 10, t: 10, b: 10 }
+                }, { responsive: true });
+            }
+
+            // Demand-Supply Analysis
+            if (data.demand_supply_forecast && data.demand_supply_forecast.all_products) {
+                const products = data.demand_supply_forecast.all_products.slice(0, 10);
+                const statusColors = {
+                    'critical_stockout_risk': '#ff6b6b',
+                    'low_stock_warning': '#ffa500',
+                    'overstock': '#764ba2',
+                    'optimal': '#51cf66'
+                };
+
+                const trace = {
+                    x: products.map(p => p.product_code),
+                    y: products.map(p => p.estimated_days_of_stock),
+                    type: 'bar',
+                    marker: { 
+                        color: products.map(p => statusColors[p.forecast_status] || '#667eea')
+                    }
+                };
+
+                Plotly.newPlot('demandSupplyChart', [trace], {
+                    yaxis: { title: 'Days of Stock' },
+                    margin: { b: 100 },
+                    xaxis: { tickangle: -45 }
+                }, { responsive: true });
+            }
+
+            // Anomalies
+            const anomaliesContainer = document.getElementById('anomaliesContainer');
+            if (data.anomalies && data.anomalies.anomalies.length > 0) {
+                anomaliesContainer.innerHTML = data.anomalies.anomalies.map(a => `
+                    <div class="anomaly-item anomaly-severity-${a.severity}">
+                        <div class="anomaly-product">${a.product_code}: ${a.location}</div>
+                        <div class="anomaly-details">
+                            Latest: ${a.latest_qty.toFixed(2)} | Average: ${a.average_qty.toFixed(2)} | 
+                            Score: ${a.anomaly_score.toFixed(2)} <span class="status-badge status-${a.severity}">${a.severity.toUpperCase()}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Recommendations
+            const recContainer = document.getElementById('recommendationsContainer');
+            if (data.optimization_recommendations && data.optimization_recommendations.length > 0) {
+                recContainer.innerHTML = data.optimization_recommendations.map(r => `
+                    <div class="recommendation-item recommendation-${r.priority}">
+                        <div class="recommendation-title">
+                            ${r.title}
+                            <span class="status-badge status-${r.priority === 'critical' ? 'critical' : r.priority === 'high' ? 'warning' : 'success'}">
+                                ${r.priority.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="recommendation-description">${r.description}</div>
+                        <div class="recommendation-impact">💡 Expected Impact: ${r.expected_impact}</div>
+                        <div class="recommendation-effort">⏱️ Effort: ${r.implementation_effort.charAt(0).toUpperCase() + r.implementation_effort.slice(1)}</div>
+                        ${r.algorithm ? `<div class="recommendation-algorithm">🤖 Algorithm: ${r.algorithm}</div>` : ''}
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        // Load analytics on page load
+        document.addEventListener('DOMContentLoaded', loadAnalytics);
+
+        // Refresh every 5 minutes
+        setInterval(loadAnalytics, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

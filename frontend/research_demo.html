@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDE Research Platform - Advanced PLM & Logistics Intelligence</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-2: #1e293b;
+            --dark-3: #334155;
+            --light: #f1f5f9;
+            --border: rgba(148, 163, 184, 0.2);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+        
+        h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.75rem; }
+        
+        .metric {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const API_BASE = 'http://localhost:8000';
+
+        // Mock data for demo
+        const MOCK_PRODUCTS = [
+            { id: 1, product_code: 'PROD-001', name: 'Standard Widget', status: 'active', current_revision_id: 5, created_at: '2025-01-10T10:00:00' },
+            { id: 2, product_code: 'PROD-002', name: 'Premium Component', status: 'active', current_revision_id: 3, created_at: '2025-01-09T14:30:00' },
+            { id: 3, product_code: 'PROD-003', name: 'Development Item', status: 'development', current_revision_id: 1, created_at: '2025-01-08T09:15:00' },
+            { id: 4, product_code: 'PROD-004', name: 'Legacy Part', status: 'discontinued', current_revision_id: 2, created_at: '2025-01-01T08:00:00' },
+        ];
+
+        const MOCK_INVENTORY = [
+            { product_id: 1, product_code: 'PROD-001', product_name: 'Standard Widget', total_on_hand: 250, total_reserved: 50, total_available: 200, product_status: 'active', location_count: 3 },
+            { product_id: 2, product_code: 'PROD-002', product_name: 'Premium Component', total_on_hand: 120, total_reserved: 20, total_available: 100, product_status: 'active', location_count: 2 },
+            { product_id: 3, product_code: 'PROD-003', product_name: 'Development Item', total_on_hand: 45, total_reserved: 10, total_available: 35, product_status: 'development', location_count: 1 },
+        ];
+
+        const MOCK_ACTIVITY = [
+            { id: 1, product_code: 'PROD-001', transaction_type: 'RECEIPT', quantity: 50, unit: 'units', location_code: 'LOC-A', created_at: '2025-01-18T14:30:00' },
+            { id: 2, product_code: 'PROD-002', transaction_type: 'SHIPMENT', quantity: 10, unit: 'units', location_code: 'LOC-B', created_at: '2025-01-18T13:15:00' },
+            { id: 3, product_code: 'PROD-003', transaction_type: 'ADJUSTMENT', quantity: -5, unit: 'units', location_code: 'LOC-C', created_at: '2025-01-18T11:45:00' },
+            { id: 4, product_code: 'PROD-001', transaction_type: 'RECEIPT', quantity: 100, unit: 'units', location_code: 'LOC-A', created_at: '2025-01-17T16:20:00' },
+        ];
+
+        function App() {
+            const [view, setView] = useState('overview');
+            
+            return (
+                <div className="container">
+                    <header style={{marginBottom: '3rem'}}>
+                        <h1>CDE Research Platform</h1>
+                        <p style={{opacity: 0.7}}>Advanced PLM and Logistics Intelligence System</p>
+                        
+                        <div style={{display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap'}}>
+                            <button className={view === 'overview' ? 'btn btn-primary' : 'btn'} onClick={() => setView('overview')}>
+                                Overview
+                            </button>
+                            <button className={view === 'plm' ? 'btn btn-primary' : 'btn'} onClick={() => setView('plm')}>
+                                PLM
+                            </button>
+                            <button className={view === 'inventory' ? 'btn btn-primary' : 'btn'} onClick={() => setView('inventory')}>
+                                Inventory
+                            </button>
+                            <button className={view === 'analytics' ? 'btn btn-primary' : 'btn'} onClick={() => setView('analytics')}>
+                                Analytics
+                            </button>
+                        </div>
+                    </header>
+                    
+                    {view === 'overview' && <Overview />}
+                    {view === 'plm' && <PLM />}
+                    {view === 'inventory' && <Inventory />}
+                    {view === 'analytics' && <Analytics />}
+                </div>
+            );
+        }
+
+        function Overview() {
+            const totalOnHand = MOCK_INVENTORY.reduce((sum, item) => sum + item.total_on_hand, 0);
+            const totalReserved = MOCK_INVENTORY.reduce((sum, item) => sum + item.total_reserved, 0);
+            const totalAvailable = MOCK_INVENTORY.reduce((sum, item) => sum + item.total_available, 0);
+
+            return (
+                <div>
+                    <h2>System Overview</h2>
+                    
+                    <div className="card" style={{marginBottom: '1.5rem', background: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)'}}>
+                        <p style={{opacity: 0.8}}>This is a demonstration view showing the CDE platform capabilities. Data shown is representative mock data.</p>
+                    </div>
+                    
+                    <div className="grid grid-4">
+                        <div className="card metric">
+                            <div className="metric-value">{MOCK_INVENTORY.length}</div>
+                            <div className="metric-label">Active Products</div>
+                        </div>
+                        <div className="card metric">
+                            <div className="metric-value">{totalOnHand}</div>
+                            <div className="metric-label">Units On Hand</div>
+                        </div>
+                        <div className="card metric">
+                            <div className="metric-value">{totalReserved}</div>
+                            <div className="metric-label">Reserved</div>
+                        </div>
+                        <div className="card metric">
+                            <div className="metric-value">{totalAvailable}</div>
+                            <div className="metric-label">Available</div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-2" style={{marginTop: '2rem'}}>
+                        <div className="card">
+                            <h3>Product Inventory Summary</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>On Hand</th>
+                                        <th>Available</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {MOCK_INVENTORY.map(item => (
+                                        <tr key={item.product_id}>
+                                            <td>
+                                                <strong>{item.product_code}</strong>
+                                                <br/>
+                                                <small style={{opacity: 0.7}}>{item.product_name}</small>
+                                            </td>
+                                            <td>{item.total_on_hand}</td>
+                                            <td><strong>{item.total_available}</strong></td>
+                                            <td>
+                                                <span className={`badge badge-${
+                                                    item.product_status === 'active' ? 'success' :
+                                                    item.product_status === 'development' ? 'warning' :
+                                                    'danger'
+                                                }`}>
+                                                    {item.product_status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="card">
+                            <h3>Recent Activity</h3>
+                            <div style={{maxHeight: '400px', overflowY: 'auto'}}>
+                                {MOCK_ACTIVITY.map(item => (
+                                    <div key={item.id} style={{
+                                        padding: '1rem',
+                                        borderBottom: '1px solid var(--border)',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start'
+                                    }}>
+                                        <div>
+                                            <strong>{item.product_code}</strong>
+                                            <div style={{fontSize: '0.85rem', opacity: 0.7, marginTop: '0.25rem'}}>
+                                                {item.transaction_type} - {item.quantity} {item.unit} @ {item.location_code}
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '0.75rem', opacity: 0.5, whiteSpace: 'nowrap', marginLeft: '1rem'}}>
+                                            {new Date(item.created_at).toLocaleString()}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function PLM() {
+            return (
+                <div>
+                    <h2>Product Lifecycle Management</h2>
+                    
+                    <div className="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Current Revision</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {MOCK_PRODUCTS.map(product => (
+                                    <tr key={product.id}>
+                                        <td><strong>{product.product_code}</strong></td>
+                                        <td>{product.name}</td>
+                                        <td>
+                                            <span className={`badge badge-${
+                                                product.status === 'active' ? 'success' :
+                                                product.status === 'development' ? 'warning' :
+                                                'danger'
+                                            }`}>
+                                                {product.status}
+                                            </span>
+                                        </td>
+                                        <td>{product.current_revision_id || 'None'}</td>
+                                        <td>{new Date(product.created_at).toLocaleDateString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="card" style={{marginTop: '2rem'}}>
+                        <h3>PLM Features</h3>
+                        <ul style={{listStyle: 'none', paddingLeft: 0}}>
+                            <li style={{padding: '0.75rem 0', borderBottom: '1px solid var(--border)'}}>Product creation and lifecycle management</li>
+                            <li style={{padding: '0.75rem 0', borderBottom: '1px solid var(--border)'}}>Bill of Materials (BOM) management</li>
+                            <li style={{padding: '0.75rem 0', borderBottom: '1px solid var(--border)'}}>Revision control and change tracking</li>
+                            <li style={{padding: '0.75rem 0'}}>Integration with supply chain</li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+
+        function Inventory() {
+            return (
+                <div>
+                    <h2>Inventory Management</h2>
+                    
+                    <div className="grid grid-2">
+                        <div className="card">
+                            <h3>Inventory by Location</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Location</th>
+                                        <th>On Hand</th>
+                                        <th>Available</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {MOCK_INVENTORY.map((item, idx) => (
+                                        <tr key={idx}>
+                                            <td><strong>{item.product_code}</strong></td>
+                                            <td>LOC-{String.fromCharCode(65 + idx)}</td>
+                                            <td>{item.total_on_hand}</td>
+                                            <td><strong>{item.total_available}</strong></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="card">
+                            <h3>Inventory Metrics</h3>
+                            <div style={{padding: '1rem 0'}}>
+                                <div style={{marginBottom: '2rem'}}>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7, marginBottom: '0.5rem'}}>Total Inventory Value</div>
+                                    <div style={{fontSize: '2.5rem', fontWeight: 700, color: 'var(--success)'}}>$284,500</div>
+                                </div>
+                                <div style={{marginBottom: '2rem'}}>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7, marginBottom: '0.5rem'}}>Stock Turnover Ratio</div>
+                                    <div style={{fontSize: '2.5rem', fontWeight: 700, color: 'var(--primary)'}}>3.2x</div>
+                                </div>
+                                <div>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7, marginBottom: '0.5rem'}}>Inventory Health</div>
+                                    <div style={{fontSize: '2.5rem', fontWeight: 700, color: 'var(--success)'}}>94%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function Analytics() {
+            const statusCounts = MOCK_INVENTORY.reduce((acc, item) => {
+                acc[item.product_status] = (acc[item.product_status] || 0) + 1;
+                return acc;
+            }, {});
+
+            return (
+                <div>
+                    <h2>Analytics and Insights</h2>
+                    
+                    <div className="grid grid-3">
+                        <div className="card">
+                            <h3>Product Status Distribution</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.entries(statusCounts).map(([status, count]) => (
+                                        <tr key={status}>
+                                            <td>
+                                                <span className={`badge badge-${
+                                                    status === 'active' ? 'success' :
+                                                    status === 'development' ? 'warning' :
+                                                    'danger'
+                                                }`}>
+                                                    {status}
+                                                </span>
+                                            </td>
+                                            <td>{count}</td>
+                                            <td>{Math.round(count / MOCK_INVENTORY.length * 100)}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="card">
+                            <h3>Top Products</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>On Hand</th>
+                                        <th>Reserved</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {MOCK_INVENTORY.sort((a, b) => b.total_on_hand - a.total_on_hand).slice(0, 5).map(item => (
+                                        <tr key={item.product_id}>
+                                            <td><strong>{item.product_code}</strong></td>
+                                            <td>{item.total_on_hand}</td>
+                                            <td>{item.total_reserved}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="card">
+                            <h3>Key Metrics</h3>
+                            <div style={{padding: '1rem 0'}}>
+                                <div style={{marginBottom: '1.5rem'}}>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7}}>Avg Units per Product</div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700}}>
+                                        {Math.round(MOCK_INVENTORY.reduce((sum, i) => sum + i.total_on_hand, 0) / MOCK_INVENTORY.length)}
+                                    </div>
+                                </div>
+                                <div style={{marginBottom: '1.5rem'}}>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7}}>Total SKUs</div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700}}>{MOCK_PRODUCTS.length}</div>
+                                </div>
+                                <div>
+                                    <div style={{fontSize: '0.9rem', opacity: 0.7}}>Fulfillment Rate</div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700}}>96%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="card" style={{marginTop: '2rem'}}>
+                        <h3>Complete Inventory Matrix</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Product Name</th>
+                                    <th>Status</th>
+                                    <th>On Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>Locations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {MOCK_INVENTORY.map(item => (
+                                    <tr key={item.product_id}>
+                                        <td><strong>{item.product_code}</strong></td>
+                                        <td>{item.product_name}</td>
+                                        <td>
+                                            <span className={`badge badge-${
+                                                item.product_status === 'active' ? 'success' :
+                                                item.product_status === 'development' ? 'warning' :
+                                                'danger'
+                                            }`}>
+                                                {item.product_status}
+                                            </span>
+                                        </td>
+                                        <td>{item.total_on_hand}</td>
+                                        <td>{item.total_reserved}</td>
+                                        <td><strong>{item.total_available}</strong></td>
+                                        <td>{item.location_count}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

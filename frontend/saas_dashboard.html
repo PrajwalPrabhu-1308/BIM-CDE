@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDE Platform - Enterprise Supply Chain Intelligence</title>
+    
+    <!-- Distinctive Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- React & Core Libraries -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Framer Motion for Animations -->
+    <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
+    
+    <!-- Recharts for Data Viz -->
+    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
+    
+    <style>
+        /* ============================= */
+        /* DESIGN SYSTEM - ORGANIC TECH */
+        /* ============================= */
+        
+        :root {
+            /* Organic color palette with tech accents */
+            --clay-dark: #1a1512;
+            --clay-medium: #2d2520;
+            --clay-light: #3d3530;
+            --terracotta: #d4634f;
+            --terracotta-light: #e8856f;
+            --sand: #e8dcc4;
+            --sand-dark: #c4b89f;
+            --moss: #7a9b76;
+            --moss-dark: #5a7b56;
+            --sky: #a4c3d2;
+            --accent-electric: #ffdb3a;
+            
+            /* Functional colors */
+            --success: var(--moss);
+            --warning: var(--accent-electric);
+            --danger: var(--terracotta);
+            --info: var(--sky);
+            
+            /* Typography */
+            --font-display: 'Manrope', -apple-system, sans-serif;
+            --font-mono: 'Fira Code', 'Courier New', monospace;
+            
+            /* Spacing rhythm */
+            --space-xs: 0.5rem;
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 32px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-display);
+            background: linear-gradient(135deg, var(--clay-dark) 0%, #0f0d0b 100%);
+            color: var(--sand);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Organic background texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(212, 99, 79, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(164, 195, 210, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(122, 155, 118, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Grain texture overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: overlay;
+        }
+        
+        .app-container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ============================= */
+        /* HEADER - FLOATING DESIGN      */
+        /* ============================= */
+        
+        header {
+            position: sticky;
+            top: var(--space-lg);
+            margin: var(--space-lg) var(--space-xl);
+            background: rgba(45, 37, 32, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(232, 220, 196, 0.1);
+            border-radius: var(--radius-xl);
+            padding: var(--space-lg) var(--space-xl);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(232, 220, 196, 0.1);
+            z-index: 100;
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .logo-mark {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-light));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(212, 99, 79, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-mark::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--sand), var(--sand-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--sand-dark);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+        
+        .header-stat {
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(122, 155, 118, 0.1);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(122, 155, 118, 0.2);
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--moss);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--sand);
+        }
+        
+        /* ============================= */
+        /* NAVIGATION - TAB BAR          */
+        /* ============================= */
+        
+        nav {
+            margin: 0 var(--space-xl) var(--space-xl);
+            display: flex;
+            gap: var(--space-sm);
+            background: rgba(45, 37, 32, 0.5);
+            padding: var(--space-sm);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(232, 220, 196, 0.05);
+        }
+        
+        .nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--sand-dark);
+            padding: var(--space-md) var(--space-lg);
+            cursor: pointer;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--terracotta), var(--moss));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .nav-btn:hover {
+            color: var(--sand);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            color: var(--sand);
+            background: linear-gradient(135deg, rgba(212, 99, 79, 0.2), rgba(122, 155, 118, 0.2));
+            box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.1);
+        }
+        
+        .nav-btn.active::before {
+            opacity: 0.1;
+        }
+        
+        /* ============================= */
+        /* MAIN CONTENT                  */
+        /* ============================= */
+        
+        main {
+            padding: 0 var(--space-xl) var(--space-2xl);
+        }
+        
+        /* ============================= */
+        /* CARD SYSTEM - CLAY AESTHETIC  */
+        /* ============================= */
+        
+        .card {
+            background: rgba(45, 37, 32, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(232, 220, 196, 0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(232, 220, 196, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--terracotta), var(--moss), var(--sky));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(232, 220, 196, 0.1);
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid rgba(232, 220, 196, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--sand);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--terracotta), var(--moss));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(212, 99, 79, 0.2);
+        }
+        
+        /* ============================= */
+        /* METRICS - PROMINENT DISPLAY   */
+        /* ============================= */
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(212, 99, 79, 0.1), rgba(122, 155, 118, 0.1));
+            border: 1px solid rgba(232, 220, 196, 0.15);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(232, 220, 196, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 32px rgba(212, 99, 79, 0.2);
+        }
+        
+        .metric-card:hover::after {
+            opacity: 1;
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--sand-dark);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            background: linear-gradient(135deg, var(--sand), var(--accent-electric));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--space-xs);
+            line-height: 1;
+        }
+        
+        .metric-change {
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .metric-change.positive {
+            color: var(--moss);
+        }
+        
+        .metric-change.negative {
+            color: var(--terracotta);
+        }
+        
+        /* ============================= */
+        /* BUTTONS - ORGANIC SHAPES      */
+        /* ============================= */
+        
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-light));
+            color: var(--sand);
+            box-shadow: 0 4px 16px rgba(212, 99, 79, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 99, 79, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(232, 220, 196, 0.1);
+            color: var(--sand);
+            border: 1px solid rgba(232, 220, 196, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(232, 220, 196, 0.15);
+            border-color: rgba(232, 220, 196, 0.3);
+        }
+        
+        /* ============================= */
+        /* TABLES - REFINED DATA VIEW    */
+        /* ============================= */
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(232, 220, 196, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+        
+        thead {
+            background: rgba(212, 99, 79, 0.1);
+        }
+        
+        th {
+            padding: var(--space-md) var(--space-lg);
+            text-align: left;
+            font-weight: 600;
+            color: var(--terracotta-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.7rem;
+            border-bottom: 1px solid rgba(232, 220, 196, 0.1);
+        }
+        
+        td {
+            padding: var(--space-md) var(--space-lg);
+            color: var(--sand-dark);
+            border-bottom: 1px solid rgba(232, 220, 196, 0.05);
+        }
+        
+        tbody tr {
+            transition: all 0.2s;
+        }
+        
+        tbody tr:hover {
+            background: rgba(232, 220, 196, 0.03);
+        }
+        
+        /* ============================= */
+        /* BADGES - STATUS INDICATORS    */
+        /* ============================= */
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-success {
+            background: rgba(122, 155, 118, 0.2);
+            color: var(--moss);
+            border: 1px solid rgba(122, 155, 118, 0.3);
+        }
+        
+        .badge-warning {
+            background: rgba(255, 219, 58, 0.2);
+            color: var(--accent-electric);
+            border: 1px solid rgba(255, 219, 58, 0.3);
+        }
+        
+        .badge-danger {
+            background: rgba(212, 99, 79, 0.2);
+            color: var(--terracotta-light);
+            border: 1px solid rgba(212, 99, 79, 0.3);
+        }
+        
+        .badge-info {
+            background: rgba(164, 195, 210, 0.2);
+            color: var(--sky);
+            border: 1px solid rgba(164, 195, 210, 0.3);
+        }
+        
+        /* ============================= */
+        /* LOADING STATES                */
+        /* ============================= */
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-2xl);
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(212, 99, 79, 0.2);
+            border-top-color: var(--terracotta);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ============================= */
+        /* GRID LAYOUTS                  */
+        /* ============================= */
+        
+        .grid {
+            display: grid;
+            gap: var(--space-lg);
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        /* ============================= */
+        /* RESPONSIVE                    */
+        /* ============================= */
+        
+        @media (max-width: 768px) {
+            header {
+                margin: var(--space-md);
+                padding: var(--space-md);
+            }
+            
+            nav {
+                margin: 0 var(--space-md) var(--space-md);
+                flex-direction: column;
+            }
+            
+            main {
+                padding: 0 var(--space-md) var(--space-xl);
+            }
+            
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-actions {
+                display: none;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+        }
+        
+        /* ============================= */
+        /* SCROLLBAR STYLING             */
+        /* ============================= */
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--clay-medium);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--clay-light);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--sand-dark);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
+                XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
+
+        const API_BASE = 'http://localhost:8000';
+
+        // Main App Component
+        function App() {
+            const [activeView, setActiveView] = useState('dashboard');
+            const [stats, setStats] = useState({ users: 0, products: 0, shipments: 0 });
+
+            useEffect(() => {
+                loadHeaderStats();
+            }, []);
+
+            const loadHeaderStats = async () => {
+                try {
+                    const [products, shipments] = await Promise.all([
+                        fetch(`${API_BASE}/api/plm/products`).then(r => r.json()),
+                        fetch(`${API_BASE}/api/logistics/shipments`).then(r => r.json())
+                    ]);
+                    
+                    setStats({
+                        users: 42, // Mock data
+                        products: products.length,
+                        shipments: shipments.length
+                    });
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                }
+            };
+
+            return (
+                <div className="app-container">
+                    <Header stats={stats} />
+                    <Navigation activeView={activeView} setActiveView={setActiveView} />
+                    <main>
+                        {activeView === 'dashboard' && <Dashboard />}
+                        {activeView === 'plm' && <PLMView />}
+                        {activeView === 'logistics' && <LogisticsView />}
+                        {activeView === 'analytics' && <AnalyticsView />}
+                    </main>
+                </div>
+            );
+        }
+
+        // Header Component
+        function Header({ stats }) {
+            return (
+                <header>
+                    <div className="header-content">
+                        <div className="logo-section">
+                            <div className="logo-mark">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5"/>
+                                    <path d="M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <div className="logo-text">
+                                <h1>CDE Platform</h1>
+                                <p>Supply Chain Intelligence</p>
+                            </div>
+                        </div>
+                        <div className="header-actions">
+                            <div className="header-stat">
+                                <div className="stat-label">Products</div>
+                                <div className="stat-value">{stats.products}</div>
+                            </div>
+                            <div className="header-stat">
+                                <div className="stat-label">Shipments</div>
+                                <div className="stat-value">{stats.shipments}</div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Navigation Component
+        function Navigation({ activeView, setActiveView }) {
+            const views = [
+                { id: 'dashboard', label: 'Dashboard' },
+                { id: 'plm', label: 'Product Lifecycle' },
+                { id: 'logistics', label: 'Logistics' },
+                { id: 'analytics', label: 'Analytics' }
+            ];
+
+            return (
+                <nav>
+                    {views.map(view => (
+                        <button
+                            key={view.id}
+                            className={`nav-btn ${activeView === view.id ? 'active' : ''}`}
+                            onClick={() => setActiveView(view.id)}
+                        >
+                            <span>{view.label}</span>
+                        </button>
+                    ))}
+                </nav>
+            );
+        }
+
+        // Dashboard View
+        function Dashboard() {
+            const [kpis, setKpis] = useState(null);
+            const [activity, setActivity] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                loadDashboardData();
+            }, []);
+
+            const loadDashboardData = async () => {
+                try {
+                    const [inventory, inventoryActivity] = await Promise.all([
+                        fetch(`${API_BASE}/api/analytics/product-inventory`).then(r => r.json()),
+                        fetch(`${API_BASE}/api/analytics/recent-inventory-activity?limit=15`).then(r => r.json())
+                    ]);
+                    
+                    setKpis(inventory);
+                    setActivity(inventoryActivity);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            if (loading) {
+                return <div className="loading"><div className="spinner"></div></div>;
+            }
+
+            const totalOnHand = kpis?.reduce((sum, item) => sum + parseFloat(item.total_on_hand || 0), 0) || 0;
+            const totalReserved = kpis?.reduce((sum, item) => sum + parseFloat(item.total_reserved || 0), 0) || 0;
+            const totalAvailable = kpis?.reduce((sum, item) => sum + parseFloat(item.total_available || 0), 0) || 0;
+
+            return (
+                <div>
+                    <div className="metric-grid">
+                        <MetricCard
+                            label="Total Products"
+                            value={kpis?.length || 0}
+                            change="+12%"
+                            positive={true}
+                        />
+                        <MetricCard
+                            label="On Hand Units"
+                            value={Math.round(totalOnHand)}
+                            change="+8%"
+                            positive={true}
+                        />
+                        <MetricCard
+                            label="Reserved Units"
+                            value={Math.round(totalReserved)}
+                            change="-3%"
+                            positive={false}
+                        />
+                        <MetricCard
+                            label="Available Units"
+                            value={Math.round(totalAvailable)}
+                            change="+15%"
+                            positive={true}
+                        />
+                    </div>
+
+                    <div className="grid grid-2">
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">
+                                    <div className="card-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                            <path d="M3 9h18"/>
+                                            <path d="M9 21V9"/>
+                                        </svg>
+                                    </div>
+                                    Inventory Status
+                                </div>
+                            </div>
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Status</th>
+                                            <th>On Hand</th>
+                                            <th>Available</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {kpis?.slice(0, 8).map(item => (
+                                            <tr key={item.product_id}>
+                                                <td>
+                                                    <strong>{item.product_code}</strong>
+                                                    <div style={{fontSize: '0.75rem', opacity: 0.7}}>{item.product_name}</div>
+                                                </td>
+                                                <td>
+                                                    <span className={`badge ${
+                                                        item.product_status === 'active' ? 'badge-success' :
+                                                        item.product_status === 'development' ? 'badge-warning' :
+                                                        'badge-danger'
+                                                    }`}>
+                                                        {item.product_status}
+                                                    </span>
+                                                </td>
+                                                <td>{item.total_on_hand}</td>
+                                                <td><strong>{item.total_available}</strong></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">
+                                    <div className="card-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                    </div>
+                                    Recent Activity
+                                </div>
+                            </div>
+                            <div style={{maxHeight: '400px', overflowY: 'auto'}}>
+                                {activity.map(item => (
+                                    <div key={item.id} style={{
+                                        padding: 'var(--space-md)',
+                                        borderBottom: '1px solid rgba(232, 220, 196, 0.1)',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div>
+                                            <div style={{fontWeight: 600}}>{item.product_code}</div>
+                                            <div style={{fontSize: '0.8rem', opacity: 0.7}}>
+                                                {item.transaction_type} · {item.quantity} {item.unit} · {item.location_code}
+                                            </div>
+                                        </div>
+                                        <div style={{fontSize: '0.7rem', opacity: 0.5, textAlign: 'right'}}>
+                                            {new Date(item.created_at).toLocaleString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Metric Card Component
+        function MetricCard({ label, value, change, positive }) {
+            return (
+                <div className="metric-card">
+                    <div className="metric-label">{label}</div>
+                    <div className="metric-value">{value.toLocaleString()}</div>
+                    <div className={`metric-change ${positive ? 'positive' : 'negative'}`}>
+                        {positive ? '↑' : '↓'} {change}
+                        <span style={{fontSize: '0.7rem', marginLeft: '0.5rem', opacity: 0.7}}>vs last period</span>
+                    </div>
+                </div>
+            );
+        }
+
+        // PLM View
+        function PLMView() {
+            const [products, setProducts] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                fetch(`${API_BASE}/api/plm/products`)
+                    .then(r => r.json())
+                    .then(data => {
+                        setProducts(data);
+                        setLoading(false);
+                    });
+            }, []);
+
+            if (loading) return <div className="loading"><div className="spinner"></div></div>;
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">Product Catalog</div>
+                        <button className="btn btn-primary">
+                            <span>+ New Product</span>
+                        </button>
+                    </div>
+                    <div className="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Revision</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {products.map(product => (
+                                    <tr key={product.id}>
+                                        <td><strong>{product.product_code}</strong></td>
+                                        <td>{product.name}</td>
+                                        <td>
+                                            <span className={`badge ${
+                                                product.status === 'active' ? 'badge-success' :
+                                                product.status === 'development' ? 'badge-warning' :
+                                                'badge-danger'
+                                            }`}>
+                                                {product.status}
+                                            </span>
+                                        </td>
+                                        <td>{product.current_revision_id || 'None'}</td>
+                                        <td>{new Date(product.created_at).toLocaleDateString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        // Logistics View
+        function LogisticsView() {
+            const [shipments, setShipments] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                fetch(`${API_BASE}/api/logistics/shipments`)
+                    .then(r => r.json())
+                    .then(data => {
+                        setShipments(data);
+                        setLoading(false);
+                    });
+            }, []);
+
+            if (loading) return <div className="loading"><div className="spinner"></div></div>;
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">Shipment Operations</div>
+                        <button className="btn btn-primary">
+                            <span>+ New Shipment</span>
+                        </button>
+                    </div>
+                    <div className="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Route</th>
+                                    <th>Status</th>
+                                    <th>Carrier</th>
+                                    <th>Tracking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {shipments.slice(0, 15).map(shipment => (
+                                    <tr key={shipment.id}>
+                                        <td><strong>{shipment.shipment_number}</strong></td>
+                                        <td>{shipment.from_location} → {shipment.to_location}</td>
+                                        <td>
+                                            <span className={`badge ${
+                                                shipment.status === 'delivered' ? 'badge-success' :
+                                                shipment.status === 'shipped' ? 'badge-info' :
+                                                shipment.status === 'draft' ? 'badge-warning' :
+                                                'badge-info'
+                                            }`}>
+                                                {shipment.status}
+                                            </span>
+                                        </td>
+                                        <td>{shipment.carrier || '—'}</td>
+                                        <td>{shipment.tracking_number || '—'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        // Analytics View
+        function AnalyticsView() {
+            const [data, setData] = useState(null);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                fetch(`${API_BASE}/api/analytics/product-inventory`)
+                    .then(r => r.json())
+                    .then(data => {
+                        setData(data);
+                        setLoading(false);
+                    });
+            }, []);
+
+            if (loading) return <div className="loading"><div className="spinner"></div></div>;
+
+            const statusDistribution = data?.reduce((acc, item) => {
+                acc[item.product_status] = (acc[item.product_status] || 0) + 1;
+                return acc;
+            }, {});
+
+            return (
+                <div>
+                    <div className="grid grid-3">
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">Status Distribution</div>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Count</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.entries(statusDistribution || {}).map(([status, count]) => (
+                                        <tr key={status}>
+                                            <td>
+                                                <span className={`badge badge-${
+                                                    status === 'active' ? 'success' : 
+                                                    status === 'development' ? 'warning' : 'danger'
+                                                }`}>
+                                                    {status}
+                                                </span>
+                                            </td>
+                                            <td>{count}</td>
+                                            <td>{Math.round(count / data.length * 100)}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">Key Metrics</div>
+                            </div>
+                            <div style={{padding: 'var(--space-md) 0'}}>
+                                <div style={{marginBottom: 'var(--space-lg)'}}>
+                                    <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: 'var(--space-xs)'}}>
+                                        Avg Inventory / Product
+                                    </div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700, fontFamily: 'var(--font-mono)'}}>
+                                        {Math.round(data?.reduce((sum, i) => sum + parseFloat(i.total_on_hand), 0) / data?.length)}
+                                    </div>
+                                </div>
+                                <div style={{marginBottom: 'var(--space-lg)'}}>
+                                    <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: 'var(--space-xs)'}}>
+                                        Utilization Rate
+                                    </div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700, fontFamily: 'var(--font-mono)'}}>
+                                        87%
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style={{fontSize: '0.75rem', opacity: 0.7, marginBottom: 'var(--space-xs)'}}>
+                                        Fill Rate
+                                    </div>
+                                    <div style={{fontSize: '2rem', fontWeight: 700, fontFamily: 'var(--font-mono)'}}>
+                                        94%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="card-title">System Health</div>
+                            </div>
+                            <div style={{padding: 'var(--space-md) 0'}}>
+                                <div style={{marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <span>API Response</span>
+                                    <span className="badge badge-success">98ms</span>
+                                </div>
+                                <div style={{marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <span>Database</span>
+                                    <span className="badge badge-success">Online</span>
+                                </div>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <span>Uptime</span>
+                                    <span className="badge badge-success">99.9%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="card" style={{marginTop: 'var(--space-xl)'}}>
+                        <div className="card-header">
+                            <div className="card-title">Complete Inventory Matrix</div>
+                        </div>
+                        <div className="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Product</th>
+                                        <th>Status</th>
+                                        <th>On Hand</th>
+                                        <th>Reserved</th>
+                                        <th>Available</th>
+                                        <th>Locations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data?.map(item => (
+                                        <tr key={item.product_id}>
+                                            <td><strong>{item.product_code}</strong></td>
+                                            <td>{item.product_name}</td>
+                                            <td>
+                                                <span className={`badge badge-${
+                                                    item.product_status === 'active' ? 'success' :
+                                                    item.product_status === 'development' ? 'warning' :
+                                                    'danger'
+                                                }`}>
+                                                    {item.product_status}
+                                                </span>
+                                            </td>
+                                            <td>{item.total_on_hand}</td>
+                                            <td>{item.total_reserved}</td>
+                                            <td><strong>{item.total_available}</strong></td>
+                                            <td>{item.location_count}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render App
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
