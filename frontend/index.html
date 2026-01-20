@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDE - Common Data Environment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <h1 class="text-2xl font-bold">CDE - Common Data Environment</h1>
+            <p class="text-sm text-blue-100">PLM & Logistics Management System</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-1">
+                <button onclick="showTab('plm')" id="tab-plm" class="px-6 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600">
+                    PLM
+                </button>
+                <button onclick="showTab('logistics')" id="tab-logistics" class="px-6 py-3 text-sm font-medium text-gray-600 hover:text-gray-800">
+                    Logistics
+                </button>
+                <button onclick="showTab('analytics')" id="tab-analytics" class="px-6 py-3 text-sm font-medium text-gray-600 hover:text-gray-800">
+                    Analytics
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- PLM Section -->
+        <div id="content-plm" class="tab-content">
+            <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+                <p class="text-sm text-blue-700">This is a demonstration view with mock data. To use real data, authenticate with the API.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Products -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Products</h2>
+                    <div class="mb-4">
+                        <button onclick="loadProducts()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                            Load Products
+                        </button>
+                    </div>
+                    <div id="products-list" class="space-y-2">
+                        <p class="text-gray-500 text-sm">Click "Load Products" to view</p>
+                    </div>
+                </div>
+
+                <!-- BOM Editor -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">BOM Editor</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Product:</label>
+                        <select id="product-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" onchange="loadBOM()">
+                            <option value="">-- Select a product --</option>
+                        </select>
+                    </div>
+                    <div id="bom-list" class="space-y-2">
+                        <p class="text-gray-500 text-sm">Select a product to view BOM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logistics Section -->
+        <div id="content-logistics" class="tab-content hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+                <p class="text-sm text-blue-700">This is a demonstration view with mock data. To use real data, authenticate with the API.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Inventory -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Inventory Balances</h2>
+                    <div class="mb-4">
+                        <button onclick="loadInventory()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                            Load Inventory
+                        </button>
+                    </div>
+                    <div id="inventory-list" class="overflow-x-auto">
+                        <p class="text-gray-500 text-sm">Click "Load Inventory" to view</p>
+                    </div>
+                </div>
+
+                <!-- Shipments -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Shipments</h2>
+                    <div class="mb-4">
+                        <button onclick="loadShipments()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                            Load Shipments
+                        </button>
+                    </div>
+                    <div id="shipments-list" class="space-y-2">
+                        <p class="text-gray-500 text-sm">Click "Load Shipments" to view</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="content-analytics" class="tab-content hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+                <p class="text-sm text-blue-700">This is a demonstration view with mock data. To use real data, authenticate with the API.</p>
+            </div>
+            <div class="space-y-6">
+                <!-- Product Inventory Summary -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Product Inventory Summary</h2>
+                    <button onclick="loadProductInventorySummary()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm mb-4">
+                        Load Summary
+                    </button>
+                    <div id="analytics-inventory" class="overflow-x-auto">
+                        <p class="text-gray-500 text-sm">Click "Load Summary" to view</p>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Recent Inventory Activity</h2>
+                    <button onclick="loadRecentActivity()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm mb-4">
+                        Load Activity
+                    </button>
+                    <div id="analytics-activity" class="overflow-x-auto">
+                        <p class="text-gray-500 text-sm">Click "Load Activity" to view</p>
+                    </div>
+                </div>
+
+                <!-- Shipment Overview -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Shipment Overview</h2>
+                    <button onclick="loadShipmentOverview()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm mb-4">
+                        Load Overview
+                    </button>
+                    <div id="analytics-shipments" class="overflow-x-auto">
+                        <p class="text-gray-500 text-sm">Click "Load Overview" to view</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mock Data
+        const MOCK_PRODUCTS = [
+            { id: 1, product_code: 'PROD-001', name: 'Standard Widget', status: 'active' },
+            { id: 2, product_code: 'PROD-002', name: 'Premium Component', status: 'active' },
+            { id: 3, product_code: 'PROD-003', name: 'Development Item', status: 'development' },
+        ];
+
+        const MOCK_REVISIONS = {
+            1: [{ id: 1, revision_number: 1, status: 'released' }],
+            2: [{ id: 3, revision_number: 1, status: 'released' }],
+            3: [{ id: 4, revision_number: 1, status: 'draft' }]
+        };
+
+        const MOCK_BOM = {
+            1: [
+                { position_number: 1, child_product_id: 'PROD-002', quantity: 2, unit: 'EA' },
+                { position_number: 2, child_product_id: 'PROD-003', quantity: 1, unit: 'EA' }
+            ]
+        };
+
+        const MOCK_INVENTORY = [
+            { product_id: 'PROD-001', location_code: 'LOC-A', quantity_on_hand: 250, quantity_reserved: 50, quantity_available: 200 },
+            { product_id: 'PROD-002', location_code: 'LOC-B', quantity_on_hand: 120, quantity_reserved: 20, quantity_available: 100 },
+            { product_id: 'PROD-003', location_code: 'LOC-C', quantity_on_hand: 45, quantity_reserved: 10, quantity_available: 35 },
+        ];
+
+        const MOCK_SHIPMENTS = [
+            { shipment_number: 'SHP-001', from_location: 'LOC-A', to_location: 'LOC-B', status: 'shipped', carrier: 'FedEx' },
+            { shipment_number: 'SHP-002', from_location: 'LOC-B', to_location: 'LOC-C', status: 'delivered', carrier: 'UPS' },
+        ];
+
+        const MOCK_ANALYTICS_INVENTORY = [
+            { product_code: 'PROD-001', product_name: 'Standard Widget', product_status: 'active', total_on_hand: 250, total_reserved: 50, total_available: 200, location_count: 2 },
+            { product_code: 'PROD-002', product_name: 'Premium Component', product_status: 'active', total_on_hand: 120, total_reserved: 20, total_available: 100, location_count: 1 },
+            { product_code: 'PROD-003', product_name: 'Development Item', product_status: 'development', total_on_hand: 45, total_reserved: 10, total_available: 35, location_count: 1 },
+        ];
+
+        const MOCK_ACTIVITY = [
+            { created_at: '2025-01-18T14:30:00', product_code: 'PROD-001', location_code: 'LOC-A', transaction_type: 'receipt', quantity: 50, balance_after: 250 },
+            { created_at: '2025-01-18T13:15:00', product_code: 'PROD-002', location_code: 'LOC-B', transaction_type: 'issue', quantity: 10, balance_after: 120 },
+        ];
+
+        const MOCK_SHIPMENT_OVERVIEW = [
+            { shipment_number: 'SHP-001', status: 'shipped', from_location: 'LOC-A', to_location: 'LOC-B', line_count: 2, total_quantity_planned: 100, total_quantity_picked: 100, total_quantity_packed: 100 },
+            { shipment_number: 'SHP-002', status: 'delivered', from_location: 'LOC-B', to_location: 'LOC-C', line_count: 1, total_quantity_planned: 50, total_quantity_picked: 50, total_quantity_packed: 50 },
+        ];
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+                btn.classList.add('text-gray-600');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+        }
+
+        function loadProducts() {
+            const html = MOCK_PRODUCTS.map(p => `
+                <div class="border border-gray-200 rounded p-3 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-sm">${p.product_code}</h4>
+                            <p class="text-xs text-gray-600">${p.name}</p>
+                            <span class="inline-block px-2 py-1 text-xs rounded mt-1 ${
+                                p.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            }">${p.status}</span>
+                        </div>
+                        <button onclick="loadRevisions(${p.id}, '${p.product_code}')" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                            View Revisions
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('products-list').innerHTML = html || '<p class="text-gray-500 text-sm">No products</p>';
+        }
+
+        function loadRevisions(productId, productCode) {
+            const revisions = MOCK_REVISIONS[productId] || [];
+            const select = document.getElementById('product-select');
+            select.innerHTML = revisions.map(r => `<option value="${r.id}">${productCode} Rev ${r.revision_number}</option>`).join('');
+            if (revisions.length > 0) {
+                select.value = revisions[0].id;
+                loadBOM();
+            }
+        }
+
+        function loadBOM() {
+            const revisionId = document.getElementById('product-select').value;
+            if (!revisionId) return;
+            const bom = MOCK_BOM[revisionId] || [];
+            const html = bom.length > 0 ? `
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50"><tr><th class="px-2 py-2">Pos</th><th class="px-2 py-2">Child Product</th><th class="px-2 py-2">Qty</th></tr></thead>
+                    <tbody>
+                        ${bom.map(item => `<tr class="border-b"><td class="px-2 py-2">${item.position_number}</td><td class="px-2 py-2">${item.child_product_id}</td><td class="px-2 py-2">${item.quantity}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            ` : '<p class="text-gray-500 text-sm">No BOM items</p>';
+            document.getElementById('bom-list').innerHTML = html;
+        }
+
+        function loadInventory() {
+            const html = MOCK_INVENTORY.length > 0 ? `
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50"><tr><th class="px-2 py-2">Product</th><th class="px-2 py-2">Location</th><th class="px-2 py-2">On Hand</th><th class="px-2 py-2">Available</th></tr></thead>
+                    <tbody>
+                        ${MOCK_INVENTORY.map(b => `<tr class="border-b"><td class="px-2 py-2">${b.product_id}</td><td class="px-2 py-2">${b.location_code}</td><td class="px-2 py-2">${b.quantity_on_hand}</td><td class="px-2 py-2">${b.quantity_available}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            ` : '<p class="text-gray-500 text-sm">No inventory</p>';
+            document.getElementById('inventory-list').innerHTML = html;
+        }
+
+        function loadShipments() {
+            const html = MOCK_SHIPMENTS.map(s => `
+                <div class="border border-gray-200 rounded p-3 hover:bg-gray-50">
+                    <h4 class="font-medium text-sm">${s.shipment_number}</h4>
+                    <p class="text-xs text-gray-600">${s.from_location} → ${s.to_location}</p>
+                    <span class="inline-block px-2 py-1 text-xs rounded mt-1 ${s.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${s.status}</span>
+                </div>
+            `).join('');
+            document.getElementById('shipments-list').innerHTML = html || '<p class="text-gray-500 text-sm">No shipments</p>';
+        }
+
+        function loadProductInventorySummary() {
+            const html = `
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50"><tr><th class="px-2 py-2">Code</th><th class="px-2 py-2">Product</th><th class="px-2 py-2">Status</th><th class="px-2 py-2">On Hand</th><th class="px-2 py-2">Available</th></tr></thead>
+                    <tbody>
+                        ${MOCK_ANALYTICS_INVENTORY.map(d => `<tr class="border-b"><td class="px-2 py-2 font-medium">${d.product_code}</td><td class="px-2 py-2">${d.product_name}</td><td class="px-2 py-2"><span class="px-2 py-1 rounded text-xs ${d.product_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${d.product_status}</span></td><td class="px-2 py-2">${d.total_on_hand}</td><td class="px-2 py-2 font-medium">${d.total_available}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('analytics-inventory').innerHTML = html;
+        }
+
+        function loadRecentActivity() {
+            const html = `
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50"><tr><th class="px-2 py-2">Date</th><th class="px-2 py-2">Product</th><th class="px-2 py-2">Type</th><th class="px-2 py-2">Qty</th></tr></thead>
+                    <tbody>
+                        ${MOCK_ACTIVITY.map(d => `<tr class="border-b"><td class="px-2 py-2">${new Date(d.created_at).toLocaleString()}</td><td class="px-2 py-2">${d.product_code}</td><td class="px-2 py-2"><span class="px-2 py-1 rounded text-xs ${d.transaction_type === 'receipt' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${d.transaction_type}</span></td><td class="px-2 py-2">${d.quantity}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('analytics-activity').innerHTML = html;
+        }
+
+        function loadShipmentOverview() {
+            const html = `
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50"><tr><th class="px-2 py-2">Shipment</th><th class="px-2 py-2">Status</th><th class="px-2 py-2">Route</th><th class="px-2 py-2">Planned</th><th class="px-2 py-2">Picked</th></tr></thead>
+                    <tbody>
+                        ${MOCK_SHIPMENT_OVERVIEW.map(d => `<tr class="border-b"><td class="px-2 py-2 font-medium">${d.shipment_number}</td><td class="px-2 py-2"><span class="px-2 py-1 rounded text-xs ${d.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${d.status}</span></td><td class="px-2 py-2">${d.from_location} → ${d.to_location}</td><td class="px-2 py-2">${d.total_quantity_planned}</td><td class="px-2 py-2">${d.total_quantity_picked}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('analytics-shipments').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
